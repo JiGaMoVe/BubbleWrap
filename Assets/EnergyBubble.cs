@@ -31,6 +31,8 @@ public class EnergyBubble : MonoBehaviour
     
     private IEnumerator OnEnergyFullCoroutine()
     {
+        SfxController.Instance.PlayBubblePop();
+        MusicController.Instance.SwitchGlow();
         yield return StartCoroutine(_animation.Animate());
         bubbleImage.color = Color.clear;
 

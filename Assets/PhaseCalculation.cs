@@ -29,5 +29,10 @@ public class PhaseCalculation : MonoBehaviour
         if (currentValue == _phase) return;
         _phase = currentValue;
         _moveWrap.SpeedUp();
+        
+        if (_phase % 2 == 0)
+        {
+            MusicController.Instance.NextSong();
+        }
     }
 }

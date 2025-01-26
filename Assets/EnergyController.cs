@@ -7,7 +7,7 @@ public class EnergyController : MonoBehaviour
     [SerializeField] private EnergyBubble energyBubble;
     [SerializeField] private int correctToExplode;
     
-    public bool ActiveStarMode { get; set; }
+    public bool ActiveStarMode { get; private set; }
 
     private void OnEnable()
     {
@@ -33,6 +33,23 @@ public class EnergyController : MonoBehaviour
         ActiveStarMode = true;
         yield return new WaitForSeconds(5);
         ActiveStarMode = false;
+        StartCoroutine(WaitToSpecialEnd());
+    }
+
+    private IEnumerator WaitToSpecialEnd()
+    {
+        while (true)
+        {
+            if (FindObjectsByType<Bubble>(FindObjectsInactive.Exclude, FindObjectsSortMode.None).Any(bubble => bubble.BubbleType is BubbleType.Special))
+            {
+                yield return new WaitForSeconds(0.5f);
+                continue;
+            }
+
+            break;
+        }
+        
+        MusicController.Instance.SwitchGlow();
     }
 
     public void AddEnergy()

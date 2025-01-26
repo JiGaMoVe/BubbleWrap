@@ -81,15 +81,18 @@ public class Bubble : MonoBehaviour
                 _comboController.IncrementCombo();
                 _scoreController.AddScore();
                 _energyController.AddEnergy();
+                SfxController.Instance.PlayPlasticBubblePop();
                 break;
             case BubbleType.Special:
                 _explosion.Explode();
                 _comboController.IncrementCombo();
                 _scoreController.AddSpecialScore();
+                SfxController.Instance.PlayPlasticBubblePop();
                 break;
             case BubbleType.Incorrect:
                 _scoreController.RemoveScore();
                 _explosion.FailExplode();
+                SfxController.Instance.PlayFailPlasticBubblePop();
                 break;
             default: 
                 throw new ArgumentOutOfRangeException();
