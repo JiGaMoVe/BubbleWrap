@@ -1,31 +1,61 @@
+using System;
 using UnityEngine;
+
+public enum BubbleType
+{
+    Correct,
+    Special,
+    Incorrect
+}
 
 public class Bubble : MonoBehaviour
 {
     private AlphaButton _button;
     private IExplosion _explosion;
     private IActive _active;
-
-    private bool _isCorrect;
+    private ISpecial _special;
     
-    public bool IsCorrect
+    private EnergyController _energyController;
+    private ComboController _comboController;
+    private ScoreController _scoreController;
+    
+    private BubbleType _bubbleType = BubbleType.Incorrect;
+    
+    public BubbleType BubbleType
     {
-        get => _isCorrect;
+        get => _bubbleType;
         set
         {
-            _isCorrect = value;
-            if (_isCorrect)
+            _bubbleType = value;
+            switch (_bubbleType)
             {
-                _active .Activate();
+                case BubbleType.Correct:
+                    if (IsExploded) return;
+                    _active.Activate();
+                    break;
+                case BubbleType.Special:
+                    if (IsExploded) return;
+                    _special.Activate();
+                    break;
+                case BubbleType.Incorrect:
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
             }
         }
     }
 
+    public bool IsExploded { get; private set; }
+
     private void Awake()
     {
-        _button = GetComponent<AlphaButton>();
-        _explosion = GetComponent<IExplosion>();
+        _button = GetComponentInChildren<AlphaButton>();
+        _explosion = GetComponentInChildren<IExplosion>();
         _active = GetComponent<IActive>();
+        _special = GetComponent<ISpecial>();
+        _energyController = FindAnyObjectByType<EnergyController>();
+        _comboController = FindAnyObjectByType<ComboController>();
+        _scoreController = FindAnyObjectByType<ScoreController>();
     }
 
     private void OnEnable()
@@ -40,13 +70,29 @@ public class Bubble : MonoBehaviour
 
     private void OnClick()
     {
-        if (IsCorrect)
+        IsExploded = true;
+        _active.Deactivate();
+        _special.Deactivate();
+        
+        switch (_bubbleType)
         {
-            _explosion.Explode();
-        }
-        else
-        {
-            _explosion.FailExplode();
+            case BubbleType.Correct:
+                _explosion.Explode();
+                _comboController.IncrementCombo();
+                _scoreController.AddScore();
+                _energyController.AddEnergy();
+                break;
+            case BubbleType.Special:
+                _explosion.Explode();
+                _comboController.IncrementCombo();
+                _scoreController.AddSpecialScore();
+                break;
+            case BubbleType.Incorrect:
+                _scoreController.RemoveScore();
+                _explosion.FailExplode();
+                break;
+            default: 
+                throw new ArgumentOutOfRangeException();
         }
     }
 }

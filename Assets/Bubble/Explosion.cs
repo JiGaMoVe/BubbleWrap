@@ -7,27 +7,39 @@ public interface IExplosion
     public void FailExplode();
 }
 
-[RequireComponent(typeof(Image))]
 public class Explosion : MonoBehaviour, IExplosion
 {
-    private Image _image;
+    [SerializeField] private Sprite explodeSprite;
+    [SerializeField] private Follower explosionPrefab;
+    [SerializeField] private Follower failExplosionPrefab;
+    [SerializeField] private Color failExplosionColor;
+    
     private AlphaButton _button;
+    private Image _image;
+    private Canvas _canvas;
     
     private void Awake()
     {
         _image = GetComponent<Image>();
         _button = GetComponent<AlphaButton>();
+        _canvas = GetComponentInParent<Canvas>();
     }
     
     public void Explode()
     {
-        _image.color = Color.blue;
+        var follower = Instantiate(explosionPrefab, transform.position, Quaternion.identity, _canvas.transform);
+        follower.Target = transform;
+        _image.sprite = explodeSprite;
         _button.Interactable = false;
+        Destroy(follower.gameObject, 2f);
     }
 
     public void FailExplode()
     {
-        _image.color = Color.grey;
+        var follower = Instantiate(failExplosionPrefab, transform.position, Quaternion.identity, _canvas.transform);
+        follower.Target = transform;
+        _image.color = failExplosionColor;
         _button.Interactable = false;
+        Destroy(follower.gameObject, 2f);
     }
 }

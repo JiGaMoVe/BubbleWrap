@@ -10,6 +10,15 @@ public class SelectCorrectBubbles : MonoBehaviour
     private void Start()
     {
         if (!_line.Bubbles.Any()) return;
+
+        if (FindAnyObjectByType<EnergyController>().ActiveStarMode)
+        {
+            foreach (var bubble in _line.Bubbles)
+            {
+                bubble.BubbleType = BubbleType.Special;
+            }
+            return;
+        }
         
         int correctQuantity = Random.Range(MinCorrectQuantity(), MaxCorrectQuantity() + 1);
         
@@ -17,10 +26,10 @@ public class SelectCorrectBubbles : MonoBehaviour
         {
             while (true)
             {
-                if (_line.Bubbles.All(bubble => bubble.IsCorrect)) break;
+                if (_line.Bubbles.All(bubble => bubble.BubbleType is BubbleType.Correct)) break;
                 var bubble = _line.Bubbles[Random.Range(0, _line.Bubbles.Count)];
-                if (bubble.IsCorrect) continue;
-                bubble.IsCorrect = true;
+                if (bubble.BubbleType is BubbleType.Correct) continue;
+                bubble.BubbleType = BubbleType.Correct;
                 break;
             }
             
