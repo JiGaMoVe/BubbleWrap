@@ -19,4 +19,9 @@ public class MainMenuButtons : MonoBehaviour
     {
         credits.SetActive(true);
     }
+
+    public void CloseCredits()
+    {
+        credits.SetActive(false);
+    }
 }
